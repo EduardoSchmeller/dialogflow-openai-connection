@@ -1,41 +1,8 @@
 const express = require('express');
 const { WebhookClient } = require("dialogflow-fulfillment");
 const { Configuration, OpenAIApi } = require("openai");
+const chatgpt = require ("./openai_utils.js");
 require('dotenv').config();
-
-console.log(process.env.OPENAI_API_KEY);
-console.log(process.env.OPENAI_API_KEY);
-console.log(process.env.OPENAI_API_KEY);
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
-
-const textGeneration = async (prompt) => {
-  try {
-    const response = await openai.createCompletion({
-      model: 'text-davinci-003',
-      prompt: `Human: ${prompt}\nAI: `,
-      temperature: 0.9,
-      max_tokens: 500,
-      top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0.6,
-      stop: ['Human:', 'AI:']
-    });
-
-    return {
-      status: 1,
-      response: response.data.choices[0].text
-    };
-  } catch (error) {
-    return {
-      status: 0,
-      response: ''
-    };
-  }
-};
 
 const webApp = express();
 
@@ -55,10 +22,11 @@ webApp.post('/dialogflow', async (req, res) => {
   let queryText = req.body.queryResult.queryText;
 
   if (action === 'input.unknown') {
-    let result = await textGeneration(queryText);
+    let result = await chatgpt.textGeneration(queryText);
+    console.log(result);
     if (result.status === 1) {
       res.send({
-        fulfillmentText: result.response.data.choices[0].text  // Updated to correctly access the text response
+        fulfillmentText: result.response.data.choices[0].text
       });
     } else {
       res.send({
