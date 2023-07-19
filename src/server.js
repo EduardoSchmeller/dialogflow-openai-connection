@@ -4,6 +4,8 @@ const { Configuration, OpenAIApi } = require("openai");
 require('dotenv').config();
 
 console.log(process.env.OPENAI_API_KEY);
+console.log(process.env.OPENAI_API_KEY);
+console.log(process.env.OPENAI_API_KEY);
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -54,9 +56,9 @@ webApp.post('/dialogflow', async (req, res) => {
 
   if (action === 'input.unknown') {
     let result = await textGeneration(queryText);
-    if (result.status == 1) {
+    if (result.status === 1) {
       res.send({
-        fulfillmentText: result.response
+        fulfillmentText: result.response.data.choices[0].text  // Updated to correctly access the text response
       });
     } else {
       res.send({
